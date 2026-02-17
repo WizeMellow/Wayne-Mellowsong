@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Lyric Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #121212;
+            --genius-yellow: #ffff64;
+            --highlight-gray: #e9e9e9;
+            --border-color: #222;
+            --sidebar-width: 380px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Crimson Pro', serif;
+            overflow-x: hidden;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            background: linear-gradient(to bottom, #111, #333);
+            color: white;
+            padding: 4rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .album-art {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #ff0055, #ffcc00);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            animation: float 6s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        .song-info h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            margin: 0;
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        .song-info h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            margin: 10px 0 0 0;
+            opacity: 0.8;
+            font-weight: 700;
+        }
+
+        /* --- MAIN LAYOUT --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr var(--sidebar-width);
+            gap: 4rem;
+            padding: 3rem 2rem;
+            min-height: 80vh;
+        }
+
+        .lyrics-col {
+            font-size: 1.35rem;
+            line-height: 1.8;
+        }
+
+        .lyric-line {
+            padding: 2px 6px;
+            margin-bottom: 2px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+            display: table;  
+            width: auto;     
+        }
+
+        .lyric-line.annotated {
+            background-color: var(--highlight-gray);
+            cursor: pointer;
+            color: #333;
+        }
+
+        .lyric-line.annotated:hover {
+            background-color: #d6d6d6;
+        }
+
+        .lyric-line.active {
+            background-color: var(--genius-yellow);
+            color: black;
+            box-shadow: 0 4px 12px rgba(255, 255, 100, 0.4);
+            transform: scale(1.02);
+            z-index: 10;
+        }
+
+        .structure-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            font-weight: bold;
+        }
+
+        .annotation-sidebar {
+            position: relative;
+        }
+
+        .sticky-box {
+            position: sticky;
+            top: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .sticky-box.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .annotation-card {
+            background: white;
+            border: 1px solid #eee;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 2rem;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .annotation-card::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            transform: rotate(45deg);
+            border-left: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .annotation-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1rem;
+        }
+
+        .annotation-body {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* NEW: Styles to ensure images fit inside the annotation sidebar */
+        .annotation-body img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+            .hero { flex-direction: column; text-align: center; }
+            .annotation-sidebar {
+                position: fixed;
+                bottom: 0; left: 0; right: 0;
+                z-index: 100;
+                pointer-events: none;
+            }
+            .sticky-box {
+                position: static;
+                transform: translateY(100%);
+            }
+            .sticky-box.show {
+                transform: translateY(0);
+                pointer-events: all;
+            }
+            .annotation-card {
+                border-radius: 12px 12px 0 0;
+            }
+            .annotation-card::before { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <div class="album-art"></div>
+        <div class="song-info">
+            <h1 id="song-title">Title Loading...</h1>
+            <h2 id="song-artist">Artist Loading...</h2>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="lyrics-col" id="lyrics-root"></div>
+
+        <aside class="annotation-sidebar">
+            <div class="sticky-box" id="annotation-box">
+                <div class="annotation-card">
+                    <div class="annotation-label">Genius Annotation</div>
+                    <div class="annotation-body" id="annotation-content"></div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        const songData = {
+            title: "Imagine",
+            artist: "Mellow & Wayne",
+            lyrics: [
+                { text: "[CHORUS x2]", annotation: "" },
+                { text: "I saw you at the end of my line", annotation: "End of my line, means I found you at my lowest point, 'line' also refers to a candle wick. Meaning I found you when I was losing my spark" },
+                { text: "I really just wanna make you mine", annotation: "" },
+                { text: "Can just imagine all the times", annotation: "Can only imagine all the times we'd spend together..." },
+                { text: "Can just imagine what were like", annotation: "Can only imagine, or have the idea of what we'd be like together..." },
+                { text: "", annotation: "" },
+                { text: "[Verse - Mellow]", annotation: "" },
+                { text: "It feel like christmas year round I'm gifted by your presence", annotation: "the word 'Presence' works as a homophone/double meaning with the word 'presents' The girl being the gift itself, and being around her feels like being blessed every day/ being gifted, thus it feels like Christmas year round." },
+                { text: "Your superpower is attraction girl you MARVELous", annotation: "She attracts me as if she had superpowers. I call her MARVElous, which is wordplay that means that she's beautiful, and also nods to the superhero team MARVEL." },
+                { text: "I don't want none of that surface level love or that fake affection", annotation: "'Surf'ace level doubles as a pun on Silver Surfer from MARVEL which ties back to the line above. This line in general means I don't want one night stands or to oversexualise women. I don't want to be in a relationship for the hell of it. I wanna get to know you.", image: "images (1).jpg" },
+                { text: "I'd rather walk the long road don't even start the engine", annotation: "This line means I don't want quick love or a relationship just for the sake of being in one. I want something deeper a connection that could last a lifetime, and I'd rahter not rush the journey by car, I'd rather WALK the long road with you and take our time" },
+                { text: "I ain't saying loves a drug but damn that shit be potent", annotation: "This line plays on the comparison between love and drugs. I rejects the cliché idea that love is something artificial or addictive in a reckless way like drugs, but still acknowledging its strength. By calling it “potent,” I suggests my love for her is strong!" },
+                { text: "It's the dopest but like the smack it can leave you broken", annotation: "This line plays with alot of meanings! calling love 'dope' frames it as something cool or powerful, but 'dope' is also slang for drugs, setting up the extended metaphor when I say 'like the smack it can leave you broke', the word smack works on several levels. On one level it referneces slap fighting competitions, where a single smack can visibly leave someone shaken or broken, mirroring how love or heartbreak can feel like an unexpected slap to the face. On another level, 'smack' is slang for heroin, tying back to the earlier dope references. THis reinforces the idea that love is powerful, but also destructive. And finally, They often use chalk which can resemble powdered drugs, subtly blending everything together together.", image: "EAR (1).png"  },
+                { text: "a beautiful poison, but ima try i'm still devoted", annotation: "Love can be a beautiful poisin, or a double edged sword. This ties back to the drug lines again, for exampel someone who vapes does it because it feels good despite knowing its not good for them. All these drug lines is not to say this is what love is always like but from past experiences that's what it was like for me, and i'm scared of that outcome. But despite that ima still try with her! This slightly ties back with the second line, love on the surface(beautiful) can loog good but thats not always the case(poison). and that's not what I want" },
+                { text: "Smoked both the verse and the chorus I'm double jointed", annotation: "When I say 'smoked the verse and chorus, it works on multiple levels. On the surface, it's a boast, meaning I dominted both sections of the song, leaving them 'smoked' in the sense of being destroyed by my performance. At the same time smoking leaves smoke, which ties back to the earlier drug imagery. The line 'double jointed' cleverly adds another layer, double jointed litterally means your flexible, pointing towards me being flexable with rapping, but also 'joint' is slang for something you smoke.,  ( SIDE NOTE:    smoking involves fire too which can be interpreted as spitting fire, or a references to the first line in the chourus, meaning my spark has came back now that I'm with you!)", image: "1.png",},
+            ]
+        };
+                
+        const lyricsContainer = document.getElementById('lyrics-root');
+        const annotationBox = document.getElementById('annotation-box');
+        const annotationContent = document.getElementById('annotation-content');
+        let activeLine = null;
+
+        document.getElementById('song-title').innerText = songData.title;
+        document.getElementById('song-artist').innerText = songData.artist;
+
+        songData.lyrics.forEach((lineData) => {
+            const lineEl = document.createElement('div');
+            
+            if (lineData.text.startsWith('[')) {
+                lineEl.className = 'structure-label';
+                lineEl.innerText = lineData.text;
+            } 
+            else if (lineData.text === "") {
+                lineEl.innerHTML = "&nbsp;";
+                lineEl.style.marginBottom = "1rem";
+                lineEl.style.display = "block"; 
+            }
+            else {
+                lineEl.className = 'lyric-line';
+                lineEl.innerText = lineData.text;
+
+                if (lineData.annotation && lineData.annotation.trim() !== "") {
+                    lineEl.classList.add('annotated');
+                    lineEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        // Pass the whole lineData object so we can check for an image
+                        handleLineClick(lineEl, lineData);
+                    });
+                }
+            }
+            lyricsContainer.appendChild(lineEl);
+        });
+
+        function handleLineClick(element, data) {
+            if (activeLine) activeLine.classList.remove('active');
+            if (activeLine === element) {
+                closeAnnotation();
+                return;
+            }
+            activeLine = element;
+            activeLine.classList.add('active');
+            
+            // Build the content: Start with text
+            let finalHTML = data.annotation;
+
+            // If an image property exists, add it to the HTML
+            if (data.image) {
+                finalHTML += `<img src="${data.image}" alt="annotation image">`;
+            }
+
+            annotationContent.innerHTML = finalHTML;
+            annotationBox.classList.add('show');
+        }
+
+        function closeAnnotation() {
+            if (activeLine) activeLine.classList.remove('active');
+            activeLine = null;
+            annotationBox.classList.remove('show');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.lyric-line') && !e.target.closest('.annotation-card')) {
+                closeAnnotation();
+            }
+        });
+    </script>
+</body>
+</html>
